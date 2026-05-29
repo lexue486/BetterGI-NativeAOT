@@ -1,0 +1,44 @@
+name: 编译 NativeAOT .so
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 安装 .NET 8 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: 安装 Android NDK
+        run: |
+          wget -q https://dl.google.com/android/repository/android-ndk-r27c-linux.zip
+          unzip -q android-ndk-r27c-linux.zip
+          echo "ANDROID_NDK_HOME=$(pwd)/android-ndk-r27c" >> $GITHUB_ENV
+
+      - name: 恢复 NuGet 包
+        run: dotnet restore Bridge.csproj
+
+      - name: 编译 NativeAOT
+        run: |
+          dotnet publish Bridge.csproj \
+            -c Release \
+            -r android-arm64 \
+            --self-contained true \
+            -p:PublishAot=true \
+            -p:IlcOptimizationPreference=Speed \
+            -p:StripSymbols=true
+
+      - name: 上传产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: libbettergi_bridge
+          path: bin/Release/net8.0/android-arm64/publish/*.so
+          if-no-files-found: error
