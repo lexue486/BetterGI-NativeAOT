@@ -17,6 +17,10 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
+      - name: 安装 Android workload
+        run: |
+          dotnet workload install maui-android
+
       - name: 安装 Android NDK
         run: |
           wget -q https://dl.google.com/android/repository/android-ndk-r27c-linux.zip
