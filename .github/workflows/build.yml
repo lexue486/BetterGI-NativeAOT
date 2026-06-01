@@ -17,17 +17,22 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: 安装 Android workload
-        run: dotnet workload install android 2>&1
-
       - name: 安装 Android NDK
         run: |
           wget -q https://dl.google.com/android/repository/android-ndk-r27c-linux.zip
           unzip -q android-ndk-r27c-linux.zip
-          echo "ANDROID_NDK_HOME=$(pwd)/android-ndk-r27c" >> $GITHUB_ENV
+          echo "NDK_DIR=$(pwd)/android-ndk-r27c" >> $GITHUB_ENV
+
+      - name: 安装 Android SDK 34
+        run: |
+          wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+          unzip -q commandlinetools-linux-11076708_latest.zip
+          mkdir -p android-sdk
+          yes | ./cmdline-tools/bin/sdkmanager --sdk_root=$(pwd)/android-sdk "platforms;android-34" "build-tools;34.0.0" 2>&1 | tail -3
+          echo "ANDROID_SDK_ROOT=$(pwd)/android-sdk" >> $GITHUB_ENV
 
       - name: 恢复 NuGet 包
-        run: dotnet restore Bridge.csproj -p:RuntimeIdentifier=android-arm64 2>&1
+        run: dotnet restore Bridge.csproj 2>&1
 
       - name: 编译 NativeAOT
         run: |
@@ -36,8 +41,11 @@ jobs:
             -r android-arm64 \
             --self-contained true \
             -p:PublishAot=true \
+            -p:NativeLib=true \
             -p:IlcOptimizationPreference=Speed \
-            -p:StripSymbols=true 2>&1
+            -p:StripSymbols=true \
+            -p:AndroidNdkDirectory=$NDK_DIR \
+            -p:AndroidSdkDirectory=$ANDROID_SDK_ROOT 2>&1
 
       - name: 上传产物
         uses: actions/upload-artifact@v4
@@ -46,4 +54,5 @@ jobs:
           path: |
             bin/Release/net8.0/android-arm64/publish/*.so
             bin/Release/net8.0/android-arm64/native/*.so
+            bin/Release/net8.0/android-arm64/*.so
           if-no-files-found: warn
