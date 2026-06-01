@@ -17,9 +17,9 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: 安装 Android workload
+      - name: 安装 Android workload (for .NET8)
         run: |
-          dotnet workload install maui-android
+          dotnet workload install maui-android --skip-manifest-update --source https://api.nuget.org/v3/index.json 2>&1 | tail -5
 
       - name: 安装 Android NDK
         run: |
@@ -28,7 +28,7 @@ jobs:
           echo "ANDROID_NDK_HOME=$(pwd)/android-ndk-r27c" >> $GITHUB_ENV
 
       - name: 恢复 NuGet 包
-        run: dotnet restore Bridge.csproj
+        run: dotnet restore Bridge.csproj -p:RuntimeIdentifier=android-arm64
 
       - name: 编译 NativeAOT
         run: |
