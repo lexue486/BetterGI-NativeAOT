@@ -18,8 +18,7 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: 安装 Android workload
-        run: |
-          dotnet workload install android --skip-manifest-update --project Bridge.csproj 2>&1
+        run: dotnet workload install android 2>&1
 
       - name: 安装 Android NDK
         run: |
