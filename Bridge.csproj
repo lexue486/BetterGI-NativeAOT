@@ -4,6 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <RuntimeIdentifier>android-arm64</RuntimeIdentifier>
     <PublishAot>true</PublishAot>
+    <NativeLib>true</NativeLib>
     <SelfContained>true</SelfContained>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -12,5 +13,10 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="BettergiCore.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="JniBridge.cs" />
+    <Compile Include="MegaStubs.cs" />
+    <Compile Include="Program.cs" />
   </ItemGroup>
 </Project>
