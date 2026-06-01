@@ -17,6 +17,5 @@
   <ItemGroup>
     <Compile Include="JniBridge.cs" />
     <Compile Include="MegaStubs.cs" />
-    <Compile Include="Program.cs" />
   </ItemGroup>
 </Project>
